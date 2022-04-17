@@ -17,7 +17,7 @@ class Game
     computer.display_solution_partial
     puts "What is your next guess? (You may enter a letter
     or a whole word for your guess.)"
-    guess = gets.chomp
+    guess = gets.chomp.downcase
     return unless letter_check(guess)
 
     result = computer.check_guess(guess)
@@ -29,9 +29,13 @@ class Game
     when 'win'
       @win = true
       puts 'You win!'
+      puts "The word was #{computer.solution}."
     when false
       @guesses -= 1
-      puts 'Sorry, you lose!' if guesses.zero?
+      if guesses.zero?
+        puts 'Sorry, you lose!'
+        puts "The word was #{computer.solution}."
+      end
     end
   end
 
@@ -54,8 +58,6 @@ class Computer
     words.map!(&:chomp).select! { |word| word.length >= 5 && word.length <= 12 }
 
     @solution = words.sample
-    p solution
-
   end
 
   def display_solution_partial
@@ -90,14 +92,13 @@ class Computer
 
   def replace_letters(letter)
     letter_index = solution.chars.each_index.select { |i| solution[i] == letter }
-    letter_index.each { |i| partial_solution[i] = letter }
+    letter_index.each { |i| partial_solution[i] = "#{letter} " }
     if partial_solution.join == solution
       'win'
     else
       true
     end
   end
-
 end
 
 Game.new
