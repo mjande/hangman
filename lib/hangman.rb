@@ -9,9 +9,7 @@ class Game
     @guesses = 6
     @win = false
     @used_letters = []
-    until win == true
-      play_round
-    end
+    play_round until win == true || guesses == 0
   end
 
   def play_round
@@ -20,6 +18,8 @@ class Game
     puts "What is your next guess? (You may enter a letter
     or a whole word for your guess.)"
     guess = gets.chomp
+    return unless letter_check(guess)
+
     result = computer.check_guess(guess)
     round_result(result)
   end
@@ -31,17 +31,16 @@ class Game
       puts 'You win!'
     when false
       @guesses -= 1
+      puts 'Sorry, you lose!' if guesses.zero?
     end
   end
 
-  #put letter_check in computer class so it can work with other error messages better
   def letter_check(letter)
-    if used_letters.none?(letter) && letter.length == 1
+    if used_letters.none?(letter)
       used_letters.push(letter)
-      p used_letters
-    elsif letter.length == 1
-      puts 'You already tried that letter! Try again!'
-      play_round
+    else
+      puts 'You already tried that one! Try again!'
+      false
     end
   end
 end
@@ -74,7 +73,11 @@ class Computer
   end
 
   def check_word(word)
-    'win' if word == solution
+    if word == solution
+      'win'
+    else
+      false
+    end
   end
 
   def check_for_letter(letter)
